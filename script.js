@@ -1,38 +1,39 @@
-const square = document.getElementById('square');
+const game = document.getElementById('game');
+const dino = document.getElementById('dino');
 const distanceDisplay = document.getElementById('distance');
 const restartButton = document.getElementById('restart-button');
 
 let isJumping = false; // Флаг прыжка
 let isGameOver = false; // Флаг окончания игры
-let squarePosition = 0; // Позиция персонажа по вертикали
+let dinoPosition = 0; // Позиция персонажа по вертикали
 let distance = 0; // Счётчик очков
+let enemies = []; // Массив для хранения препятствий
 let distanceInterval; // Интервал обновления очков
+let enemyInterval; // Интервал создания препятствий
 
 const gravity = 0.9; // Сила гравитации
 const jumpHeight = 150; // Максимальная высота прыжка
 const jumpSpeed = 20; // Скорость изменения высоты прыжка
 
 function jump() {
-    if (isJumping || isGameOver) return; // Если персонаж прыгает или игра окончена, ничего не делать
+    if (isJumping) return;
 
     isJumping = true;
     let upInterval = setInterval(() => {
-        if (squarePosition >= jumpHeight) {
-            clearInterval(upInterval); // Достигнут пик прыжка
+        if (dinoPosition >= jumpHeight) {
+            clearInterval(upInterval);
             let downInterval = setInterval(() => {
-                if (squarePosition <= 0) {
-                    clearInterval(downInterval); // Персонаж вернулся на землю
-                    squarePosition = 0; // Убедимся, что позиция равна 0
-                    square.style.bottom = squarePosition + 'px';
+                if (dinoPosition <= 0) {
+                    clearInterval(downInterval);
                     isJumping = false;
                 } else {
-                    squarePosition -= jumpSpeed * gravity; // Падение вниз
-                    square.style.bottom = squarePosition + 'px';
+                    dinoPosition -= jumpSpeed * gravity;
+                    dino.style.bottom = dinoPosition + 'px';
                 }
             }, 20);
         } else {
-            squarePosition += jumpSpeed; // Подъём вверх
-            square.style.bottom = squarePosition + 'px';
+            dinoPosition += jumpSpeed;
+            dino.style.bottom = dinoPosition + 'px';
         }
     }, 20);
 }
@@ -40,9 +41,10 @@ function jump() {
 function startGame() {
     distance = 0;
     isGameOver = false;
-    squarePosition = 0; // Сбросить позицию в начале игры
     distanceDisplay.textContent = distance;
-    restartButton.style.display = 'none'; // Скрыть кнопку рестарта
+    restartButton.style.display = 'none';
+    enemies.forEach(enemy => enemy.remove());
+    enemies = [];
 
     // Обновление счётчика очков
     distanceInterval = setInterval(() => {
@@ -51,28 +53,71 @@ function startGame() {
             distanceDisplay.textContent = distance;
         }
     }, 100);
+
+    // Создание препятствий
+    enemyInterval = setInterval(() => {
+        if (!isGameOver) {
+            createEnemy();
+        }
+    }, 2000);
+}
+
+function createEnemy() {
+    const enemy = document.createElement('div');
+    enemy.classList.add('enemy');
+    enemy.style.left = game.clientWidth + 'px';
+    game.appendChild(enemy);
+    enemies.push(enemy);
+
+    const moveEnemy = setInterval(() => {
+        if (isGameOver) {
+            clearInterval(moveEnemy);
+        } else {
+            const enemyLeft = parseInt(window.getComputedStyle(enemy).getPropertyValue('left'));
+            if (enemyLeft < -30) {
+                enemy.remove();
+                enemies = enemies.filter(e => e !== enemy);
+                clearInterval(moveEnemy);
+            } else {
+                enemy.style.left = enemyLeft - 5 + 'px';
+                checkCollision(enemy);
+            }
+        }
+    }, 20);
+}
+
+function checkCollision(enemy) {
+    const enemyRect = enemy.getBoundingClientRect();
+    const dinoRect = dino.getBoundingClientRect();
+
+    if (
+        dinoRect.left < enemyRect.left + enemyRect.width &&
+        dinoRect.left + dinoRect.width > enemyRect.left &&
+        dinoRect.top < enemyRect.top + enemyRect.height &&
+        dinoRect.height + dinoRect.top > enemyRect.top
+    ) {
+        gameOver();
+    }
 }
 
 function gameOver() {
-    clearInterval(distanceInterval); // Остановить обновление очков
+    clearInterval(distanceInterval);
+    clearInterval(enemyInterval);
     isGameOver = true;
-    restartButton.style.display = 'block'; // Показать кнопку рестарта
+    restartButton.style.display = 'block';
 }
 
 function restartGame() {
     startGame();
 }
 
-// Обработка нажатия клавиши "Пробел" для прыжка
 document.addEventListener('keydown', event => {
-    if (event.code === 'Space') {
+    if (event.code === 'Space' && !isJumping && !isGameOver) {
         jump();
     }
 });
 
-// Обработка нажатия кнопки рестарта
 restartButton.addEventListener('click', restartGame);
 
-// Установка начальной позиции персонажа и запуск игры
-square.style.bottom = squarePosition + 'px';
+dino.style.bottom = dinoPosition + 'px';
 startGame();
