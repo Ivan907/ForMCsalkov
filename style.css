@@ -1,0 +1,126 @@
+/* Подключение шрифтов */
+@font-face {
+    font-family: 'font1';
+    src: url(https://rkstudios-hub.github.io/background/Game1.ttf);
+}
+
+@font-face {
+    font-family: 'font2';
+    src: url(https://rkstudios-hub.github.io/background/Game2.ttf);
+}
+
+/* Основные настройки страницы */
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('https://rkstudios-hub.github.io/background/Desert.gif');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: hidden; /* Убираем прокрутку */
+}
+
+/* Контейнер игры */
+#game {
+    position: relative;
+    width: 800px;
+    height: 300px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0); /* Полупрозрачный фон */
+    border: 1px solid #ccc;
+    z-index: 1; /* Элементы игры находятся выше фона */
+}
+
+/* Игровой персонаж (динозавр) */
+#dino {
+    position: absolute;
+    bottom: 10px;
+    left: 50px;
+    width: 50px;
+    height: 50px;
+    background-color: #4CAF50; /* Цвет персонажа */
+    z-index: 2; /* Персонаж выше земли */
+}
+
+/* Земля */
+#ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(90deg, rgba(251,161,75,1) 19%, rgba(240,190,120,1) 100%);
+    z-index: 2;
+}
+
+/* Враги */
+.enemy {
+    position: absolute;
+    bottom: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: #f00; /* Цвет врага */
+    z-index: 2;
+}
+
+/* Счётчик расстояния */
+#distance {
+    font-family: "font1";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 24px;
+    color: #000;
+    z-index: 2;
+}
+
+/* Кнопка прыжка */
+#jump-button {
+    font-family: "font2";
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* Кнопка перезапуска */
+#restart-button {
+    font-family: "font2";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px 30px;
+    font-size: 20px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: none; /* Скрыта по умолчанию */
+    z-index: 2;
+}
+
+/* Частицы (эффекты) */
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: #5df542; /* Цвет частиц */
+    z-index: 2;
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 600px) {
+    #jump-button {
+        display: block;
+    }
+}
